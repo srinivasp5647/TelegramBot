@@ -398,7 +398,7 @@ def new():
                 MessageHandler(Filters.regex('^Not Interested$'), not_interest),
                 MessageHandler(Filters.regex('^I have some experience$'), experience),
                 MessageHandler(Filters.regex('^Happy to$'), proceed),
-                MessageHandler(Filters.regex('^Not now$'), not_proceed),
+                MessageHandler(Filters.regex('^Another time$'), not_proceed),
                 MessageHandler(Filters.regex('^Not so much, but i want to learn$'), not_exp),
                 MessageHandler(Filters.regex('^Done$'), done),
             ],
