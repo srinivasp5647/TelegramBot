@@ -2,7 +2,7 @@ import re
 from threading import TIMEOUT_MAX
 
 from telegram.error import TimedOut
-from conversationbot2 import CHOOSING, TYPING_CHOICE
+from conversationbot2 import CHOOSING, TYPING_CHOICE, TYPING_REPLY
 import logging
 import sample as S
 from telegram import *   
@@ -17,7 +17,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-CHOOSING, TYPING_CHOICE = range(2)
+CHOOSING, TYPING_CHOICE, TYPING_REPLY = range(3)
 
 reply_keyboard = [
     ['Yes', 'No'],
@@ -28,7 +28,7 @@ reply_keyboard1 = [
 ]
 
 reply_keyboard2 = [
-    ['I have some experience', 'Not so much, but i want to learn']
+    ['I have some experience', 'Not so much, but I want to learn']
 ]
 
 reply_keyboard3 = [
@@ -70,7 +70,7 @@ def start(update: Update, context: CallbackContext) -> int:
             "Hi there and welcome to Fly")
         
         update.message.reply_text(
-            "Have you purchased any Fly coin?",
+            "Have you purchased from us before?",
             reply_markup = markup,
         )
         return CHOOSING
@@ -79,7 +79,7 @@ def start(update: Update, context: CallbackContext) -> int:
             "Hi there and welcome to Fly")
         
         update.message.reply_text(
-            "Have you purchased any Fly coin?",
+            "Have you purchased from us before?",
             reply_markup = markup,
         )
         return CHOOSING
@@ -91,7 +91,7 @@ def fly_yes(update: Update, context: CallbackContext) -> int:
         user = update.message.from_user
         logger.info(f"{user.first_name} purchased fly coin")
         update.message.reply_text(
-            "Great! And which portal did you use ?",
+            "Great! And which portals did you use ?",
             reply_markup = markup1,
         )
         return CHOOSING
@@ -99,7 +99,7 @@ def fly_yes(update: Update, context: CallbackContext) -> int:
         user = update.message.from_user
         logger.info(f"{user.first_name} purchased fly coin")
         update.message.reply_text(
-            "Great! And which portal did you use ?",
+            "Great! And which portals did you use ?",
             reply_markup = markup1,
         )
         return CHOOSING
@@ -112,7 +112,7 @@ def bit_portal(update: Update, context: CallbackContext) -> int:
         text = update.message.text
         context.user_data['choice'] = text
         update.message.reply_text(
-            "Yes that's one of our popular online portal for FLY Token\ntell me please, did you experience any issues when purchasing?",
+            "Yes that's one of our popular online portals for FLY Token\ntell me please, did you experience any issues when purchasing?",
             reply_markup=markup3,
             )
         return CHOOSING
@@ -121,7 +121,7 @@ def bit_portal(update: Update, context: CallbackContext) -> int:
         text = update.message.text
         context.user_data['choice'] = text
         update.message.reply_text(
-            "Yes that's one of our popular online portal for FLY Token\ntell me please, did you experience any issues when purchasing?",
+            "Yes that's one of our popular online portals for FLY Token\ntell me please, did you experience any issues when purchasing?",
             reply_markup=markup3,
             )
         return CHOOSING
@@ -178,16 +178,33 @@ def no_issue(update: Update, context: CallbackContext) -> int:
 def feedback(update: Update, context: CallbackContext) -> int:
     try:
         update.message.reply_text(
-            "Thank you, your feedback is highly appreciated.",
+            "Please, explain us the issue",
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        return TYPING_REPLY
+        
+    except:
+        update.message.reply_text(
+            "Please, explain us the issue",
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        return TYPING_REPLY
+        
+
+def received_information(update: Update, context: CallbackContext) -> int:
+    try:
+        update.message.reply_text(
+            "Thank you, your feedback is highly appreicated.",
             reply_markup=ReplyKeyboardRemove(),
         )
         return ConversationHandler.END
     except:
         update.message.reply_text(
-            "Thank you, your feedback is highly appreciated.",
+            "Thank you, your feedback is highly appreicated.",
             reply_markup=ReplyKeyboardRemove(),
         )
         return ConversationHandler.END
+
 
 def no_feedback(update: Update, context: CallbackContext) -> int:
     try:
@@ -403,9 +420,12 @@ def new():
                 MessageHandler(Filters.regex('^Done$'), done),
             ],
             TYPING_CHOICE: [
+                
                 MessageHandler(Filters.text, success)
             ],
-            
+            TYPING_REPLY: [
+                MessageHandler(Filters.text & ~(Filters.command) ,received_information)
+            ],
         },
         fallbacks=[MessageHandler(Filters.regex('^Done$'), done)],
         
