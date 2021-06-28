@@ -32,7 +32,7 @@ reply_keyboard2 = [
 ]
 
 reply_keyboard3 = [
-    ['Yes, I had some issues', 'No. Everything went smoothly']
+    ['Yes, I had some Issues', 'No. Everything went smoothly']
 ]
 
 reply_keyboard4 = [
@@ -398,7 +398,8 @@ def new():
     dp = updater.dispatcher
     print("------3----------")
     conv_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, start)],
+        entry_points=[MessageHandler(Filters.regex('^(hi|hello|hey|hii|Hi|Hello|Hey|Hii)$'), start)],
+        conversation_timeout= 30,
         states = {
             CHOOSING: [
                 MessageHandler(Filters.regex('^Yes$'), fly_yes),
